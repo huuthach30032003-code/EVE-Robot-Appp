@@ -13,8 +13,14 @@ jobs:
         with:
           node-version: 20
 
+      - name: Install dependencies
+        # Lệnh này giúp máy chủ nhận diện đúng công cụ đóng gói
+        run: |
+          npm init -y
+          npm install nwjs-builder-phoenix --save-dev
+
       - name: Build EXE
-        # Chạy lệnh build thông qua npx và chỉ định rõ thư mục hiện tại là dấu chấm (.)
+        # Ép máy chủ chạy lệnh build trực tiếp vào thư mục hiện tại
         run: npx nwjs-builder-phoenix --targets=win-x64 --out dist .
 
       - name: Upload EXE
