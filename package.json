@@ -1,31 +1,14 @@
-name: Build EVE Robot EXE
-on: [push, workflow_dispatch]
-
-jobs:
-  build:
-    runs-on: windows-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16
-
-      - name: Create Package File
-        run: |
-          echo '{ "name": "eve-robot", "main": "index.html", "window": { "toolbar": false, "frame": false, "transparent": true, "width": 600, "height": 700, "always-on-top": true } }' > package.json
-
-      - name: Install Web2Executable Tool
-        run: npm install -g nwjs-builder-phoenix
-
-      - name: Build EXE
-        run: |
-          npx nwjs-builder-phoenix --targets=win-x64 --out dist .
-
-      - name: Upload EXE
-        uses: actions/upload-artifact@v3
-        with:
-          name: EVE-Robot-Windows
-          path: dist/
+{
+  "name": "eve-robot",
+  "version": "1.0.0",
+  "main": "robot.html",
+  "window": {
+    "title": "EVE Robot",
+    "toolbar": false,
+    "frame": false,
+    "transparent": true,
+    "width": 600,
+    "height": 700,
+    "always-on-top": true
+  }
+}
