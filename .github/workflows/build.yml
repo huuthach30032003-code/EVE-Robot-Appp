@@ -6,24 +6,22 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4 # Cập nhật lên v4 cho mới nhất
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: 16
+          node-version: 20 # Dùng bản Node mới cho ổn định
 
       - name: Install Web2Executable Tool
         run: npm install -g nwjs-builder-phoenix
 
       - name: Build EXE
         run: |
-          mkdir build
-          copy index.html build\index.html
-          npx nwjs-builder-phoenix --targets=win-x64 --out dist build/
+          npx nwjs-builder-phoenix --targets=win-x64 --out dist .
 
       - name: Upload EXE
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4 # ĐÂY LÀ CHỖ QUAN TRỌNG: Sửa v3 thành v4 để hết lỗi đỏ
         with:
           name: EVE-Robot-Windows
           path: dist/
