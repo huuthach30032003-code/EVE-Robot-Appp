@@ -13,11 +13,15 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install Tools
-        run: npm install nwjs-builder-phoenix --save-dev
+      - name: Install Build Tool
+        # Thêm --global và link để máy chủ không báo lỗi "could not determine executable"
+        run: |
+          npm install -g nwjs-builder-phoenix
+          npm link nwjs-builder-phoenix
 
       - name: Build EXE
-        run: npx nwjs-builder-phoenix --targets=win-x64 --out dist .
+        # Chạy trực tiếp qua lệnh build thay vì npx để chắc chắn thành công
+        run: build --targets=win-x64 --out dist .
 
       - name: Upload EXE
         uses: actions/upload-artifact@v4
