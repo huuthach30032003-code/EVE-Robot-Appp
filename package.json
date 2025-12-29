@@ -2,6 +2,9 @@
   "name": "eve-robot",
   "version": "1.0.0",
   "main": "robot.html",
+  "scripts": {
+    "dist": "nwbuild --targets=win-x64 --out dist ."
+  },
   "window": {
     "title": "EVE Robot",
     "toolbar": false,
@@ -10,5 +13,8 @@
     "width": 600,
     "height": 700,
     "always-on-top": true
+  },
+  "devDependencies": {
+    "nwjs-builder-phoenix": "^1.15.0"
   }
 }
