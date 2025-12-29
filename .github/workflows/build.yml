@@ -1,0 +1,29 @@
+name: Build EVE Robot EXE
+on: [push, workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Install Web2Executable Tool
+        run: npm install -g nwjs-builder-phoenix
+
+      - name: Build EXE
+        run: |
+          mkdir build
+          copy index.html build\index.html
+          npx nwjs-builder-phoenix --targets=win-x64 --out dist build/
+
+      - name: Upload EXE
+        uses: actions/upload-artifact@v3
+        with:
+          name: EVE-Robot-Windows
+          path: dist/
