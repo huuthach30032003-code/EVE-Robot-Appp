@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EVE Robot - Ultimate Interactive Enhanced</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --eve-white: #ffffff;
+            --eye-blue: #00d2ff;
+            --eye-red: #ff3333;
+            --eye-pink: #ff66b2;
+            --eye-yellow: #ffcc00;
+            --eye-purple: #b366ff;
+            --eye-green: #00ff88;
+            --eye-glow: rgba(0, 210, 255, 0.6);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Segoe UI', sans-serif;
+            user-select: none;
+        }
+
+        /* --- HELP ICON --- */
+        .help-icon {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--eye-blue), var(--eye-purple));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 28px;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 5px 20px rgba(0, 210, 255, 0.5);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 1000;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .help-icon:hover {
+            transform: scale(1.15) rotate(360deg);
+            box-shadow: 0 8px 30px rgba(0, 210, 255, 0.8);
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 5px 20px rgba(0, 210, 255, 0.5); }
+            50% { box-shadow: 0 5px 30px rgba(0, 210, 255, 0.9); }
+        }
+
+        /* --- HELP PANEL --- */
+        .help-panel {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.92);
+            backdrop-filter: blur(15px);
+            border: 2px solid var(--eye-blue);
+            border-radius: 20px;
+            padding: 25px;
+            color: white;
+            width: 350px;
+            max-height: 80vh;
+            overflow-y: auto;
+            opacity: 0;
+            transform: translateY(-20px) scale(0.9);
+            pointer-events: none;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 999;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+        }
+
+        .help-panel.show {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: all;
+        }
+
+        .help-panel h3 {
+            margin-top: 0;
+            color: var(--eye-blue);
+            font-size: 20px;
+            border-bottom: 2px solid var(--eye-blue);
+            padding-bottom: 10px;
+        }
+
+        .help-section {
+            margin: 15px 0;
+        }
+
+        .help-section h4 {
+            color: var(--eye-pink);
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        .help-item {
+            margin: 8px 0;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            font-size: 13px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .help-key {
+            background: var(--eye-blue);
+            color: black;
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 11px;
+        }
+
+        /* --- CHAT BUBBLE --- */
+        .chat-bubble {
+            position: absolute;
+            top: -100px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 15px 30px;
+            border-radius: 30px;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 500;
+            opacity: 0;
+            transform: translateY(20px) scale(0.9);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: none;
+            border: 1px solid rgba(255,255,255,0.3);
+            z-index: 100;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            max-width: 300px;
+            white-space: normal;
+        }
+
+        .chat-bubble.show { opacity: 1; transform: translateY(0) scale(1); }
+        .chat-bubble::after {
+            content: ''; position: absolute; bottom: -8px; left: 50%;
+            transform: translateX(-50%) rotate(45deg);
+            width: 16px; height: 16px;
+            background: rgba(255, 255, 255, 0.15);
+            border-right: 1px solid rgba(255,255,255,0.3);
+            border-bottom: 1px solid rgba(255,255,255,0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        /* --- ROBOT CONTAINER --- */
+        .robot-container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            animation: breathe 4s ease-in-out infinite;
+        }
+        @keyframes breathe { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+
+        /* --- HEAD --- */
+        .head {
+            width: 320px; height: 230px;
+            background-color: var(--eve-white);
+            border-radius: 160px 160px 120px 120px;
+            position: relative;
+            box-shadow: inset -15px -15px 50px rgba(0,0,0,0.1), 0 20px 80px rgba(0,0,0,0.5);
+            display: flex; justify-content: center; align-items: center;
+            transition: transform 0.2s cubic-bezier(0.2, 0, 0.2, 1);
+            z-index: 10;
+        }
+
+        /* --- SCANNER BEAM EFFECT --- */
+        .scanner-beam {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 0; height: 5px;
+            background: var(--eye-blue);
+            box-shadow: 0 0 20px var(--eye-blue);
+            opacity: 0;
+            transition: all 0.3s;
+            pointer-events: none;
+            z-index: 20;
+        }
+        .head.scanning .scanner-beam {
+            width: 400px; height: 150px;
+            background: linear-gradient(180deg, rgba(0,210,255,0.2) 0%, rgba(0,210,255,0) 100%);
+            clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%);
+            top: 100%;
+            animation: scanMove 2s infinite linear;
+            opacity: 1;
+        }
+        @keyframes scanMove { 0% { opacity: 0.5; } 50% { opacity: 0.8; } 100% { opacity: 0.5; } }
+
+        .face-mask {
+            width: 85%; height: 68%;
+            background-color: #050505;
+            border-radius: 90px 90px 65px 65px;
+            display: flex; justify-content: center; align-items: center;
+            position: relative; overflow: hidden;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+        }
+
+        .features {
+            width: 100%; display: flex; flex-direction: column;
+            align-items: center; gap: 12px;
+            transition: transform 0.1s ease-out;
+        }
+
+        .eyes { display: flex; justify-content: space-between; width: 70%; }
+
+        .eye {
+            width: 75px; height: 50px;
+            background-color: var(--eye-blue);
+            border-radius: 50%;
+            box-shadow: 0 0 25px var(--eye-glow), 0 0 50px var(--eye-glow);
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+        }
+        .eye::after {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: repeating-linear-gradient(transparent 0%, transparent 40%, rgba(0,0,0,0.15) 50%);
+            background-size: 100% 6px; border-radius: inherit;
+        }
+
+        .mouth {
+            width: 40px; height: 4px;
+            background-color: var(--eye-blue);
+            border-radius: 10px;
+            box-shadow: 0 0 15px var(--eye-glow);
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            opacity: 0.8;
+        }
+
+        /* --- ORIGINAL EMOTIONS --- */
+        .head.neutral .eye { animation: blink 6s infinite; }
+        @keyframes blink { 0%, 96%, 100% { transform: scaleY(1); } 98% { transform: scaleY(0.05); } }
+
+        .head.happy .eye { height: 40px; border-radius: 10px 10px 50px 50px; transform: translateY(-5px); }
+        .head.happy .mouth { width: 50px; height: 12px; border-radius: 0 0 50px 50px; }
+
+        .head.sad .eye { height: 35px; border-radius: 50% 50% 20% 20%; transform: rotate(15deg); }
+        .head.sad .eye.right { transform: rotate(-15deg); }
+        .head.sad .mouth { width: 40px; height: 8px; border-radius: 50px 50px 0 0; transform: translateY(5px); }
+
+        .head.angry .eye { height: 30px; border-radius: 20% 20% 50% 50%; transform: rotate(-15deg) translateY(5px); background-color: var(--eye-red); box-shadow: 0 0 20px rgba(255, 50, 50, 0.6); }
+        .head.angry .eye.right { transform: rotate(15deg) translateY(5px); }
+        .head.angry .mouth { width: 20px; background-color: var(--eye-red); box-shadow: 0 0 10px rgba(255, 50, 50, 0.6); }
+
+        .head.surprised .eye { width: 60px; height: 60px; transform: scale(1.1); }
+        .head.surprised .mouth { width: 15px; height: 15px; border-radius: 50%; }
+
+        .head.thinking .eye { height: 20px; transform: translateY(-5px); }
+        .head.thinking .mouth { transform: translateX(15px); width: 15px; }
+
+        .head.love .eye { background-color: var(--eye-pink); box-shadow: 0 0 25px var(--eye-pink); height: 55px; width: 60px; }
+        .head.love .mouth { width: 30px; height: 15px; border-radius: 0 0 50px 50px; background-color: var(--eye-pink); box-shadow: 0 0 15px var(--eye-pink); }
+        
+        .head.sleep .eye { height: 2px; width: 60px; opacity: 0.3; box-shadow: none; background-color: #888; animation: none; }
+        .head.sleep .mouth { opacity: 0.1; width: 10px; }
+        .head.sleep { transform: translateY(15px) !important; }
+
+        .head.suspicious .eye.left { height: 15px; border-radius: 0; transform: scaleX(1.2); }
+        .head.suspicious .eye.right { height: 55px; width: 60px; transform: translateY(-5px); }
+        .head.suspicious .mouth { width: 30px; transform: translateX(-5px) rotate(-10deg); }
+
+        .head.scared .eye { width: 30px; height: 30px; animation: shake 0.2s infinite; }
+        .head.scared .mouth { width: 10px; height: 10px; border-radius: 50%; animation: shake 0.2s infinite; }
+        @keyframes shake { 0% { transform: translate(1px, 1px); } 50% { transform: translate(-1px, -1px); } 100% { transform: translate(1px, -1px); } }
+
+        .head.wink .eye.left { height: 45px; border-radius: 50%; }
+        .head.wink .eye.right { height: 5px; width: 60px; transform: translateY(5px); }
+        .head.wink .mouth { width: 30px; transform: rotate(5deg); }
+
+        .head.error .eye { background-color: var(--eye-red); box-shadow: 0 0 10px var(--eye-red); height: 5px; width: 60px; animation: glitch 0.1s infinite; border-radius: 0; }
+        .head.error .eye.left { transform: rotate(45deg); }
+        .head.error .eye.right { transform: rotate(-45deg); }
+        .head.error .mouth { opacity: 0; }
+        @keyframes glitch { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+        .head.dizzy .features { animation: spin 1s infinite linear; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        .head.scanning .eye { background-color: #00ff00; box-shadow: 0 0 20px #00ff00; height: 10px; border-radius: 2px; }
+        .head.scanning .mouth { background-color: #00ff00; width: 60px; }
+
+        /* --- NEW EMOTIONS --- */
+        
+        /* Laughing - Cười ngặt nghẽo */
+        .head.laughing .eye { 
+            height: 8px; 
+            width: 85px; 
+            border-radius: 0 0 50px 50px; 
+            transform: translateY(-8px);
+            animation: laughShake 0.3s infinite;
+        }
+        .head.laughing .mouth { 
+            width: 60px; 
+            height: 25px; 
+            border-radius: 0 0 70px 70px; 
+            background-color: var(--eye-yellow);
+            box-shadow: 0 0 20px var(--eye-yellow);
+        }
+        @keyframes laughShake {
+            0%, 100% { transform: translateY(-8px) rotate(-2deg); }
+            50% { transform: translateY(-8px) rotate(2deg); }
+        }
+
+        /* Crying - Khóc òa */
+        .head.crying .eye { 
+            height: 45px; 
+            border-radius: 50% 50% 20% 20%; 
+            background-color: var(--eye-blue);
+            transform: rotate(8deg);
+            animation: tearDrop 1s infinite;
+        }
+        .head.crying .eye.right { transform: rotate(-8deg); }
+        .head.crying .mouth { 
+            width: 45px; 
+            height: 10px; 
+            border-radius: 50px 50px 0 0; 
+            transform: translateY(8px);
+        }
+        .head.crying .eye::before {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            width: 6px;
+            height: 6px;
+            background: var(--eye-blue);
+            border-radius: 50%;
+            animation: tearFall 0.8s infinite;
+        }
+        @keyframes tearDrop {
+            0%, 100% { transform: rotate(8deg); }
+            50% { transform: rotate(12deg); }
+        }
+        @keyframes tearFall {
+            0% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(20px); }
+        }
+
+        /* Excited - Hứng phấn */
+        .head.excited .eye { 
+            width: 70px; 
+            height: 70px; 
+            background-color: var(--eye-yellow);
+            box-shadow: 0 0 30px var(--eye-yellow);
+            animation: excitedPulse 0.5s infinite;
+        }
+        .head.excited .mouth { 
+            width: 55px; 
+            height: 20px; 
+            border-radius: 0 0 60px 60px;
+            background-color: var(--eye-yellow);
+            box-shadow: 0 0 20px var(--eye-yellow);
+        }
+        @keyframes excitedPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* Bored - Chán nản */
+        .head.bored .eye { 
+            height: 15px; 
+            width: 70px; 
+            border-radius: 0;
+            opacity: 0.5;
+            animation: none;
+        }
+        .head.bored .mouth { 
+            width: 35px; 
+            height: 3px;
+            opacity: 0.4;
+        }
+        .head.bored { 
+            transform: translateY(10px) !important; 
+        }
+
+        /* Confused - Bối rối */
+        .head.confused .eye.left { 
+            height: 25px; 
+            width: 60px;
+            border-radius: 50% 50% 0 0;
+            transform: translateY(5px) rotate(-15deg);
+        }
+        .head.confused .eye.right { 
+            height: 50px; 
+            border-radius: 50%;
+            transform: translateY(-5px);
+        }
+        .head.confused .mouth { 
+            width: 25px; 
+            height: 6px;
+            transform: rotate(15deg) translateX(-10px);
+            border-radius: 50%;
+        }
+
+        /* Shocked - Sốc nặng */
+        .head.shocked .eye { 
+            width: 80px; 
+            height: 80px; 
+            background-color: var(--eye-yellow);
+            box-shadow: 0 0 40px var(--eye-yellow);
+            animation: shockTremble 0.1s infinite;
+        }
+        .head.shocked .mouth { 
+            width: 40px; 
+            height: 40px; 
+            border-radius: 50%;
+            background-color: var(--eye-yellow);
+        }
+        @keyframes shockTremble {
+            0%, 100% { transform: translate(0, 0); }
+            25% { transform: translate(2px, 2px); }
+            75% { transform: translate(-2px, -2px); }
+        }
+
+        /* Proud - Tự hào */
+        .head.proud .eye { 
+            height: 35px; 
+            border-radius: 50% 50% 15px 15px;
+            background-color: var(--eye-purple);
+            box-shadow: 0 0 20px var(--eye-purple);
+            transform: translateY(-8px);
+        }
+        .head.proud .mouth { 
+            width: 45px; 
+            height: 10px; 
+            border-radius: 0 0 40px 40px;
+            background-color: var(--eye-purple);
+            transform: rotate(-5deg);
+        }
+
+        /* Shy - Ngại ngùng */
+        .head.shy .eye { 
+            height: 30px; 
+            width: 55px;
+            border-radius: 50%;
+            background-color: var(--eye-pink);
+            box-shadow: 0 0 15px var(--eye-pink);
+            animation: shyLook 2s infinite;
+        }
+        .head.shy .mouth { 
+            width: 20px; 
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--eye-pink);
+            transform: translateX(-15px);
+        }
+        @keyframes shyLook {
+            0%, 100% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+        }
+
+        /* Curious - Tò mò */
+        .head.curious .eye.left { 
+            height: 55px; 
+            width: 65px;
+            border-radius: 50%;
+            transform: translateY(-5px);
+        }
+        .head.curious .eye.right { 
+            height: 35px; 
+            width: 65px;
+            border-radius: 50%;
+            transform: translateY(5px) scale(0.9);
+        }
+        .head.curious .mouth { 
+            width: 10px; 
+            height: 10px; 
+            border-radius: 50%;
+            transform: translateX(10px);
+        }
+
+        /* Playful - Tinh nghịch */
+        .head.playful .eye { 
+            background-color: var(--eye-green);
+            box-shadow: 0 0 20px var(--eye-green);
+            animation: playfulBounce 0.6s infinite;
+        }
+        .head.playful .eye.left { 
+            animation-delay: 0.1s;
+        }
+        .head.playful .mouth { 
+            width: 40px; 
+            height: 12px; 
+            border-radius: 0 0 50px 50px;
+            background-color: var(--eye-green);
+            box-shadow: 0 0 15px var(--eye-green);
+            animation: playfulWiggle 0.4s infinite;
+        }
+        @keyframes playfulBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        @keyframes playfulWiggle {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(5deg); }
+            75% { transform: rotate(-5deg); }
+        }
+
+        /* Instructional Overlay */
+        #instruction {
+            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+            color: rgba(255,255,255,0.4); font-size: 12px; pointer-events: none;
+            text-align: center;
+        }
+
+    </style>
+</head>
+<body id="body">
+
+    <!-- Help Icon -->
+    <div class="help-icon" id="helpIcon">?</div>
+    
+    <!-- Help Panel -->
+    <div class="help-panel" id="helpPanel">
+        <h3>🤖 HƯỚNG DẪN SỬ DỤNG EVE</h3>
+        
+        <div class="help-section">
+            <h4>⌨️ Phím Điều Khiển</h4>
+            <div class="help-item"><span>Bật/Tắt tương tác</span> <span class="help-key">SPACE</span></div>
+            <div class="help-item"><span>Nháy mắt</span> <span class="help-key">W</span></div>
+            <div class="help-item"><span>Lỗi hệ thống</span> <span class="help-key">E</span></div>
+            <div class="help-item"><span>Quét</span> <span class="help-key">S</span></div>
+            <div class="help-item"><span>Nhảy múa</span> <span class="help-key">D</span></div>
+            <div class="help-item"><span>Cười</span> <span class="help-key">L</span></div>
+            <div class="help-item"><span>Khóc</span> <span class="help-key">C</span></div>
+            <div class="help-item"><span>Hứng phấn</span> <span class="help-key">X</span></div>
+            <div class="help-item"><span>Chán</span> <span class="help-key">B</span></div>
+            <div class="help-item"><span>Bối rối</span> <span class="help-key">Q</span></div>
+            <div class="help-item"><span>Tự hào</span> <span class="help-key">P</span></div>
+            <div class="help-item"><span>Ngại ngùng</span> <span class="help-key">Y</span></div>
+            <div class="help-item"><span>Tò mò</span> <span class="help-key">K</span></div>
+            <div class="help-item"><span>Cù</span> <span class="help-key">T</span></div>
+        </div>
+
+        <div class="help-section">
+            <h4>🖱️ Tương Tác Chuột</h4>
+            <div class="help-item"><span>Click</span> <span>Giật mình</span></div>
+            <div class="help-item"><span>Double Click</span> <span>Yêu thương ❤️</span></div>
+            <div class="help-item"><span>Triple Click</span> <span>Cười rũ rượi 😂</span></div>
+            <div class="help-item"><span>Giữ chuột phải</span> <span>Quét đối tượng</span></div>
+            <div class="help-item"><span>Lăn chuột</span> <span>Chóng mặt</span></div>
+            <div class="help-item"><span>Di chuyển chuột</span> <span>Theo dõi bạn</span></div>
+        </div>
+
+        <div class="help-section">
+            <h4>🎭 Cảm Xúc Nhanh</h4>
+            <div class="help-item"><span>Vui</span> <span class="help-key">1</span></div>
+            <div class="help-item"><span>Buồn</span> <span class="help-key">2</span></div>
+            <div class="help-item"><span>Giận</span> <span class="help-key">3</span></div>
+            <div class="help-item"><span>Nghi ngờ</span> <span class="help-key">4</span></div>
+            <div class="help-item"><span>Yêu</span> <span class="help-key">5</span></div>
+        </div>
+    </div>
+
+    <div class="robot-container">
+        <div id="bubble" class="chat-bubble">HỆ THỐNG SẴN SÀNG</div>
+        
+        <div class="head neutral" id="head">
+            <div class="scanner-beam"></div>
+            <div class="face-mask">
+                <div class="features" id="features">
+                    <div class="eyes">
+                        <div class="eye left"></div>
+                        <div class="eye right"></div>
+                    </div>
+                    <div class="mouth"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="instruction">Nhấn [SPACE] để Tương tác • Hover vào [?] để xem hướng dẫn đầy đủ</div>
+
+    <script>
+        // ==================== CONFIG ====================
+        const CONFIG = {
+            trackSpeed: 0.1,
+            sleepTime: 10000     
+        };
+
+        // ==================== ELEMENTS ====================
+        const body = document.getElementById('body');
+        const head = document.getElementById('head');
+        const features = document.getElementById('features');
+        const bubble = document.getElementById('bubble');
+        const instruction = document.getElementById('instruction');
+        const helpIcon = document.getElementById('helpIcon');
+        const helpPanel = document.getElementById('helpPanel');
+        // ==================== STATE ====================
+        let isInteractive = false; 
+        let autoTimer;             
+        let sleepTimer;            
+        let isSleeping = false;
+        let bubbleTimeout;
+        let isDizzy = false;
+        let isScanning = false;
+        
+        let mouseX = window.innerWidth / 2;
+        let mouseY = window.innerHeight / 2;
+        let currentEyeX = 0, currentEyeY = 0;
+        let currentHeadX = 0, currentHeadY = 0;
+
+        let clickCount = 0;
+        let clickTimer;
+
+        const emotions = ['neutral', 'happy', 'sad', 'angry', 'surprised', 'thinking', 'suspicious'];
+        const allEmotions = [...emotions, 'love', 'sleep', 'wink', 'error', 'scared', 'dizzy', 'scanning', 'laughing', 'crying', 'excited', 'bored', 'confused', 'shocked', 'proud', 'shy', 'curious', 'playful'];
+
+        // ==================== AUDIO SYSTEM ====================
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const audioCtx = new AudioContext();
+
+        function playSound(type) {
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            switch(type) {
+                case 'beep':
+                    oscillator.frequency.value = 800;
+                    gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                    oscillator.start(audioCtx.currentTime);
+                    oscillator.stop(audioCtx.currentTime + 0.1);
+                    break;
+                case 'happy':
+                    oscillator.frequency.value = 600;
+                    gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                    oscillator.frequency.exponentialRampToValueAtTime(1000, audioCtx.currentTime + 0.2);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+                    oscillator.start(audioCtx.currentTime);
+                    oscillator.stop(audioCtx.currentTime + 0.2);
+                    break;
+                case 'sad':
+                    oscillator.frequency.value = 400;
+                    gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                    oscillator.frequency.exponentialRampToValueAtTime(200, audioCtx.currentTime + 0.3);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                    oscillator.start(audioCtx.currentTime);
+                    oscillator.stop(audioCtx.currentTime + 0.3);
+                    break;
+                case 'error':
+                    oscillator.type = 'sawtooth';
+                    oscillator.frequency.value = 150;
+                    gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+                    oscillator.start(audioCtx.currentTime);
+                    oscillator.stop(audioCtx.currentTime + 0.15);
+                    break;
+                case 'scan':
+                    oscillator.type = 'sine';
+                    oscillator.frequency.value = 300;
+                    gainNode.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                    oscillator.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.5);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+                    oscillator.start(audioCtx.currentTime);
+                    oscillator.stop(audioCtx.currentTime + 0.5);
+                    break;
+                case 'laugh':
+                    for(let i = 0; i < 3; i++) {
+                        setTimeout(() => {
+                            const osc = audioCtx.createOscillator();
+                            const gain = audioCtx.createGain();
+                            osc.connect(gain);
+                            gain.connect(audioCtx.destination);
+                            osc.frequency.value = 700 + (i * 100);
+                            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                            osc.start(audioCtx.currentTime);
+                            osc.stop(audioCtx.currentTime + 0.1);
+                        }, i * 100);
+                    }
+                    break;
+                case 'excited':
+                    oscillator.type = 'square';
+                    oscillator.frequency.value = 500;
+                    gainNode.gain.setValueAtTime(0.12, audioCtx.currentTime);
+                    oscillator.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.15);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+                    oscillator.start(audioCtx.currentTime);
+                    oscillator.stop(audioCtx.currentTime + 0.15);
+                    break;
+                case 'love':
+                    oscillator.type = 'sine';
+                    oscillator.frequency.value = 650;
+                    gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                    oscillator.frequency.exponentialRampToValueAtTime(900, audioCtx.currentTime + 0.25);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
+                    oscillator.start(audioCtx.currentTime);
+                    oscillator.stop(audioCtx.currentTime + 0.25);
+                    break;
+            }
+        }
+
+        // ==================== DIALOGUE SYSTEM ====================
+        const dialogues = {
+            morning: ["Chào buổi sáng! Cà phê chưa?", "Năng lượng mặt trời đã sạc đầy.", "Dậy sớm thế bạn ơi!", "Ngày mới tốt lành nha."],
+            afternoon: ["Trưa rồi, bạn ăn cơm chưa?", "Mặt trời lên cao quá.", "Hôm nay làm việc vất vả không?", "Đừng quên uống nước nhé."],
+            evening: ["Chào buổi tối!", "Đèn lên rồi đẹp quá.", "Bạn vẫn chưa nghỉ ngơi sao?", "Tối nay xem phim gì đây?"],
+            night: ["Khuya lắm rồi đó!", "Đi ngủ đi bạn ơi...", "Tớ cũng buồn ngủ rồi...", "Cú đêm hả?", "Yên tĩnh quá..."],
+            idle: [
+                "Đang quét dữ liệu...", "Wall-E đi đâu rồi nhỉ?", "Hệ thống ổn định 100%.", 
+                "Có ai muốn trồng cây không?", "Hmm... thế giới này thật thú vị.", 
+                "Tớ là robot xịn nhất đấy.", "Bạn có thấy chiếc giày nào không?",
+                "Đang phân tích không khí...", "Kết nối Wi-Fi hơi yếu...",
+                "RAM của tớ đang trống.", "Bạn đang làm gì đấy?", "Tớ đang nhìn bạn đó.",
+                "E-vaaa?", "Tớ thích màu trắng.", "Ngày hôm nay thật đẹp!", "Có gì vui không?"
+            ],
+            click: [
+                "Á! Đừng chọc!", "Hihi, nhột quá!", "Ui da!", "Cái gì đấy?", 
+                "Bạn làm tớ giật mình!", "Chạm nhẹ thôi.", "Cảm ứng của tớ nhạy lắm.",
+                "Hey! Coi chừng trầy sơn.", "Sao cứ bấm tớ hoài vậy?"
+            ],
+            love: [
+                "Yêu bạn 3000 <3", "Tim nè! 💗", "Ngại quá đi à!", "Bạn dễ thương ghê.",
+                "Moazzz! 😘", "Tớ thích bạn nhất!", "Kết nối trái tim thành công.",
+                "Bạn là người bạn tốt nhất của tớ."
+            ],
+            sleep: [
+                "Zzz...", "Sạc pin... 1%...", "Đi vào chế độ ngủ đông...", 
+                "Khò khò...", "Đừng làm phiền...", "System standby...", "Mơ về Wall-E..."
+            ],
+            error: [
+                "FATAL ERROR!", "404 Not Found!", "Cứu với! Lỗi rồi!", 
+                "Hệ thống quá tải!", "Lag quá!", "Cần khởi động lại!", "Blue Screen of Death!"
+            ],
+            wink: ["Tin tớ đi ;)", "Bí mật nhé!", "Thấy tớ ngầu không?", "Nháy mắt đưa tình nè."],
+            scan: [
+                "Đang quét virus...", "Phát hiện sự sống.", "Đối tượng an toàn.", 
+                "Đang thu thập dữ liệu sinh trắc học...", "Scan complete.", "Không tìm thấy mối đe dọa."
+            ],
+            dizzy: [
+                "Oa oa chóng mặt quá!", "Trời đất quay cuồng...", "Dừng lại đi bạn ơi!", 
+                "Buồn nôn quá...", "Cần con quay hồi chuyển mới..."
+            ],
+            comeback: [
+                "A! Bạn quay lại rồi!", "Nhớ bạn quá đi!", "Đừng bỏ tớ nữa nha.", 
+                "Tớ đợi bạn mãi.", "Welcome back, commander!"
+            ],
+            leave: [
+                "Bạn đi đâu thế?", "Đừng bỏ tớ một mình...", "Tối om, sợ quá...", 
+                "Tớ sẽ đợi ở đây...", "Nhớ quay lại sớm nha..."
+            ],
+            laugh: [
+                "HAHAHA! 😂", "Cười vỡ bụng rồi!", "Buồn cười quá!", "LOL!", 
+                "Không ngừng được! 🤣", "Ui da cười chết!"
+            ],
+            cry: [
+                "Huhuhu 😭", "Tớ buồn lắm...", "Lau nước mắt cho tớ đi...", 
+                "Sao lại như vậy...", "Khóc ròng rã..."
+            ],
+            excited: [
+                "YAYYY! 🎉", "Hứng phấn quá!", "Tuyệt vời luôn!", "Quá đã!", 
+                "Năng lượng tràn đầy!", "Let's gooo!"
+            ],
+            bored: [
+                "Chán quá...", "Buồn tẻ thật...", "Làm gì giờ?", "Không có gì vui...",
+                "*ngáp*", "Tẻ nhạt..."
+            ],
+            confused: [
+                "Hả? Cái gì?", "Tớ không hiểu...", "???", "Bối rối quá!", 
+                "Sao vậy ta?", "Đang nghĩ..."
+            ],
+            shocked: [
+                "OMG! 😱", "Không thể tin được!", "Cái gì cơ!?", "Sốc nặng!", 
+                "WTF!?", "Trời ơi!"
+            ],
+            proud: [
+                "Tớ giỏi lắm đó!", "Tự hào lắm nè!", "Xem này! 💪", "Thành công rồi!",
+                "Tớ là số 1!", "Perfect!"
+            ],
+            shy: [
+                "Ngại quá... 😳", "Xấu hổ ghê...", "Đừng nhìn tớ...", "Ơ... ơ...",
+                "Mắc cỡ lắm...", "Giấu mặt thôi..."
+            ],
+            curious: [
+                "Đó là cái gì?", "Tò mò quá!", "Để tớ xem nào...", "Thú vị đấy!",
+                "Muốn biết thêm!", "Nghiên cứu thôi!"
+            ],
+            tickle: [
+                "Hahaha dừng lại! 😂", "Щекотно!", "Nhột quá!", "Cù tớ làm gì!",
+                "Không chịu nổi!", "Hihihi!"
+            ]
+        };
+
+        function getTimeBasedDialogue() {
+            const hour = new Date().getHours();
+            if (hour >= 5 && hour < 11) return getRandomDialogue('morning');
+            if (hour >= 11 && hour < 14) return getRandomDialogue('afternoon');
+            if (hour >= 14 && hour < 18) return getRandomDialogue('afternoon');
+            if (hour >= 18 && hour < 22) return getRandomDialogue('evening');
+            return getRandomDialogue('night');
+        }
+
+        function getRandomDialogue(category) {
+            const list = dialogues[category];
+            if (!list) return "...";
+            return list[Math.floor(Math.random() * list.length)];
+        }
+
+        // ==================== CHAT SYSTEM ====================
+        function say(text, duration = 3000) {
+            bubble.innerText = text;
+            bubble.classList.add('show');
+            clearTimeout(bubbleTimeout);
+            bubbleTimeout = setTimeout(() => {
+                bubble.classList.remove('show');
+            }, duration);
+        }
+
+        // ==================== MODE MANAGEMENT ====================
+        function updateMode() {
+            if (isInteractive) {
+                say("CHẾ ĐỘ TƯƠNG TÁC: KÍCH HOẠT");
+                playSound('beep');
+                body.classList.add('interactive-mode');
+                instruction.innerText = "Chế độ Tương Tác: Di chuột, Click, Phím tắt...";
+                clearTimeout(autoTimer);
+                setEmotion('neutral');
+                resetSleepTimer();
+                physicsLoop(); 
+            } else {
+                say("CHẾ ĐỘ TỰ ĐỘNG: KÍCH HOẠT");
+                playSound('beep');
+                body.classList.remove('interactive-mode');
+                instruction.innerText = "Nhấn [SPACE] để điều khiển tớ";
+                wakeUp(); 
+                autoLoop(); 
+            }
+        }
+
+        // ==================== EVENT LISTENERS ====================
+
+        // Help Panel Toggle
+        helpIcon.addEventListener('mouseenter', () => {
+            helpPanel.classList.add('show');
+            playSound('beep');
+        });
+
+        helpIcon.addEventListener('click', () => {
+            helpPanel.classList.toggle('show');
+            playSound('beep');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!helpPanel.contains(e.target) && !helpIcon.contains(e.target)) {
+                helpPanel.classList.remove('show');
+            }
+        });
+
+        // Keyboard Interactions
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                isInteractive = !isInteractive;
+                updateMode();
+                return;
+            }
+
+            if (!isInteractive) return;
+            resetSleepTimer();
+
+            switch(e.key.toLowerCase()) {
+                case 'w': triggerAction('wink'); break;
+                case 'e': triggerAction('error'); break;
+                case 's': triggerAction('scan'); break;
+                case 'h': triggerAction('help'); break;
+                case 'd': triggerAction('dance'); break;
+                case 'l': triggerAction('laugh'); break;
+                case 'c': triggerAction('cry'); break;
+                case 'x': triggerAction('excited'); break;
+                case 'b': triggerAction('bored'); break;
+                case 'q': triggerAction('confused'); break;
+                case 'p': triggerAction('proud'); break;
+                case 'y': triggerAction('shy'); break;
+                case 'k': triggerAction('curious'); break;
+                case 't': triggerAction('tickle'); break;
+                case '1': setEmotion('happy'); say("Vui quá đi!"); playSound('happy'); break;
+                case '2': setEmotion('sad'); say("Hic hic..."); playSound('sad'); break;
+                case '3': setEmotion('angry'); say("Hừm!"); playSound('error'); break;
+                case '4': setEmotion('suspicious'); say("Nghi ngờ nha..."); playSound('beep'); break;
+                case '5': setEmotion('love'); say("<3"); playSound('love'); break;
+            }
+        });
+
+        // Mouse Interactions
+        document.addEventListener('mousemove', (e) => {
+            if (!isInteractive) return;
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            resetSleepTimer();
+        });
+
+        document.addEventListener('mousedown', (e) => {
+            if (!isInteractive || isSleeping) return;
+            
+            // Left click - Track multiple clicks
+            if (e.button === 0) {
+                clickCount++;
+                clearTimeout(clickTimer);
+                
+                if (clickCount === 1) {
+                    clickTimer = setTimeout(() => {
+                        // Single click
+                        setEmotion('surprised'); 
+                        say(getRandomDialogue('click'));
+                        playSound('beep');
+                        setTimeout(() => { if(!isScanning) setEmotion('neutral'); }, 1200); 
+                        clickCount = 0;
+                    }, 300);
+                } else if (clickCount === 2) {
+                    clearTimeout(clickTimer);
+                    clickTimer = setTimeout(() => {
+                        // Double click - Love
+                        triggerAction('love');
+                        clickCount = 0;
+                    }, 300);
+                } else if (clickCount >= 3) {
+                    // Triple click - Laugh
+                    clearTimeout(clickTimer);
+                    triggerAction('laugh');
+                    clickCount = 0;
+                }
+            }
+            
+            // Right click (hold start)
+            if (e.button === 2) {
+                triggerAction('scan');
+            }
+            resetSleepTimer();
+        });
+
+        document.addEventListener('mouseup', () => {
+             if (isScanning) {
+                 isScanning = false;
+                 head.classList.remove('scanning');
+                 setEmotion('neutral');
+             }
+        });
+
+        document.addEventListener('contextmenu', event => event.preventDefault());
+
+        // Scroll Interaction (Dizzy)
+        let scrollTimeout;
+        document.addEventListener('wheel', () => {
+            if (!isInteractive) return;
+            if (!isDizzy) {
+                isDizzy = true;
+                head.classList.add('dizzy');
+                setEmotion('surprised');
+                say(getRandomDialogue('dizzy'));
+                playSound('error');
+            }
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(() => {
+                isDizzy = false;
+                head.classList.remove('dizzy');
+                setEmotion('neutral');
+            }, 1000);
+            resetSleepTimer();
+        });
+
+        // Window Focus/Blur
+        document.addEventListener('mouseleave', () => {
+            if (!isInteractive) return;
+            setEmotion('sad');
+            say(getRandomDialogue('leave'));
+            playSound('sad');
+        });
+
+        document.addEventListener('mouseenter', () => {
+            if (!isInteractive) return;
+            setEmotion('happy');
+            say(getRandomDialogue('comeback'));
+            playSound('happy');
+            setTimeout(() => setEmotion('neutral'), 2000);
+        });
+
+        // ==================== ACTION HANDLERS ====================
+        function triggerAction(type) {
+            switch(type) {
+                case 'wink':
+                    setEmotion('wink');
+                    say(getRandomDialogue('wink'));
+                    playSound('beep');
+                    setTimeout(() => setEmotion('neutral'), 1500);
+                    break;
+                case 'error':
+                    setEmotion('error');
+                    say(getRandomDialogue('error'));
+                    playSound('error');
+                    setTimeout(() => setEmotion('neutral'), 2000);
+                    break;
+                case 'scan':
+                    isScanning = true;
+                    head.classList.add('scanning');
+                    say(getRandomDialogue('scan'));
+                    playSound('scan');
+                    break;
+                case 'love':
+                    setEmotion('love');
+                    say(getRandomDialogue('love'));
+                    playSound('love');
+                    setTimeout(() => setEmotion('neutral'), 3000);
+                    break;
+                case 'help':
+                    helpPanel.classList.add('show');
+                    say("Xem hướng dẫn bên phải nha!");
+                    playSound('beep');
+                    break;
+                case 'dance':
+                    setEmotion('playful');
+                    say("Quẩy lên nào! 🎵");
+                    playSound('excited');
+                    let start = Date.now();
+                    let danceInt = setInterval(() => {
+                        features.style.transform = `translate(${Math.sin(Date.now()/100)*20}px, ${Math.cos(Date.now()/100)*10}px)`;
+                        if (Date.now() - start > 2000) {
+                            clearInterval(danceInt);
+                            setEmotion('neutral');
+                        }
+                    }, 16);
+                    break;
+                case 'laugh':
+                    setEmotion('laughing');
+                    say(getRandomDialogue('laugh'));
+                    playSound('laugh');
+                    setTimeout(() => setEmotion('neutral'), 3000);
+                    break;
+                case 'cry':
+                    setEmotion('crying');
+                    say(getRandomDialogue('cry'));
+                    playSound('sad');
+                    setTimeout(() => setEmotion('neutral'), 4000);
+                    break;
+                case 'excited':
+                    setEmotion('excited');
+                    say(getRandomDialogue('excited'));
+                    playSound('excited');
+                    setTimeout(() => setEmotion('neutral'), 2500);
+                    break;
+                case 'bored':
+                    setEmotion('bored');
+                    say(getRandomDialogue('bored'));
+                    setTimeout(() => setEmotion('neutral'), 3000);
+                    break;
+                case 'confused':
+                    setEmotion('confused');
+                    say(getRandomDialogue('confused'));
+                    playSound('beep');
+                    setTimeout(() => setEmotion('neutral'), 2500);
+                    break;
+                case 'proud':
+                    setEmotion('proud');
+                    say(getRandomDialogue('proud'));
+                    playSound('happy');
+                    setTimeout(() => setEmotion('neutral'), 2500);
+                    break;
+                case 'shy':
+                    setEmotion('shy');
+                    say(getRandomDialogue('shy'));
+                    setTimeout(() => setEmotion('neutral'), 3000);
+                    break;
+                case 'curious':
+                    setEmotion('curious');
+                    say(getRandomDialogue('curious'));
+                    playSound('beep');
+                    setTimeout(() => setEmotion('neutral'), 2500);
+                    break;
+                case 'tickle':
+                    setEmotion('laughing');
+                    say(getRandomDialogue('tickle'));
+                    playSound('laugh');
+                    setTimeout(() => setEmotion('neutral'), 2500);
+                    break;
+            }
+        }
+
+        // ==================== AUTO MODE LOGIC ====================
+        function autoLoop() {
+            if (isInteractive) return;
+
+            const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
+            setEmotion(randomEmotion);
+
+            const moveX = (Math.random() - 0.5) * 50;
+            const moveY = (Math.random() - 0.5) * 30;
+            const rotZ = (Math.random() - 0.5) * 15;
+
+            features.style.transform = `translate(${moveX}px, ${moveY}px)`;
+            head.style.transform = `rotate(${rotZ}deg)`;
+
+            if (Math.random() > 0.4) {
+                if (Math.random() > 0.7) {
+                    say(getTimeBasedDialogue());
+                } else {
+                    say(getRandomDialogue('idle'));
+                }
+            }
+
+            const waitTime = 3000 + Math.random() * 5000;
+            autoTimer = setTimeout(autoLoop, waitTime);
+        }
+
+        // ==================== PHYSICS ENGINE ====================
+        function physicsLoop() {
+            if (!isInteractive) return;
+
+            if (!isSleeping && !isDizzy) {
+                const cx = window.innerWidth / 2;
+                const cy = window.innerHeight / 2;
+
+                const targetEyeX = (mouseX - cx) / 10; 
+                const targetEyeY = (mouseY - cy) / 10;
+                const targetHeadX = (mouseX - cx) / 25;
+                const targetHeadY = (mouseY - cy) / 25;
+
+                currentEyeX += (targetEyeX - currentEyeX) * CONFIG.trackSpeed;
+                currentEyeY += (targetEyeY - currentEyeY) * CONFIG.trackSpeed;
+                currentHeadX += (targetHeadX - currentHeadX) * 0.05;
+                currentHeadY += (targetHeadY - currentHeadY) * 0.05;
+
+                features.style.transform = `translate(${currentEyeX}px, ${currentEyeY}px)`;
+                
+                const rotY = (mouseX - cx) / 50; 
+                head.style.transform = `translate(${currentHeadX}px, ${currentHeadY}px) rotate(${rotY}deg)`;
+            }
+
+            requestAnimationFrame(physicsLoop);
+        }
+
+        // ==================== HELPERS ====================
+        function setEmotion(name) {
+            head.classList.remove(...allEmotions);
+            head.classList.add(name);
+        }
+
+        function resetSleepTimer() {
+            if (!isInteractive) return;
+            clearTimeout(sleepTimer);
+            if (isSleeping) wakeUp();
+            sleepTimer = setTimeout(() => {
+                isSleeping = true;
+                setEmotion('sleep');
+                say(getRandomDialogue('sleep'));
+            }, CONFIG.sleepTime);
+        }
+
+        function wakeUp() {
+            isSleeping = false;
+            if(isInteractive) setEmotion('neutral');
+        }
+
+        // ==================== START UP ====================
+        setTimeout(() => {
+            say(getTimeBasedDialogue());
+            playSound('happy');
+        }, 1500);
+        autoLoop();
+
+    </script>
+</body>
+</html>
